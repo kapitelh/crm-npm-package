@@ -4,12 +4,13 @@
   "description": "Zoho CRM NPM Package",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.6.7"
+    "axios": "^1.6.7",
+    "mongoose": "^8.2.1"
   }
 }
