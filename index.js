@@ -6,10 +6,12 @@ class ZohoCRMConnector {
      * @param {string} clientId - The client ID for Zoho CRM OAuth application.
      * @param {string} clientSecret - The client secret for Zoho CRM OAuth application.
      * @param {string} redirectUri - The redirect URI for Zoho CRM OAuth application.
+     * @param {string} refreshToken - The refresh token for Zoho CRM OAuth application.
      */
-    constructor(clientId, clientSecret, redirectUri) {
+    constructor(clientId, clientSecret, redirectUri, refreshToken) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
+        this.refreshToken = refreshToken;
         this.redirectUri = redirectUri;
         this.baseURL = 'https://www.zohoapis.com/crm/v2';
     }
@@ -32,6 +34,42 @@ class ZohoCRMConnector {
             return response.data;
         } catch (error) {
             console.error('Failed to create lead in Zoho CRM:', error.response ? error.response.data : error);
+            throw error;
+        }
+    }
+
+    /**
+     * Retrieves a new access token using the stored refresh token.
+     *
+     * This method makes a request to the Zoho OAuth server using the refresh token to obtain a new access token.
+     * It should be called when the current access token has expired or when a new access token is needed.
+     *
+     * @returns {Promise<string>} A promise that resolves with the new access token.
+     * @throws {Error} Throws an error if the request to the OAuth server fails or if the server's response does not include an access token.
+     */
+    async getAccessToken() {
+        try {
+            const response = await axios.post(this.tokenURL, null, {
+                params: {
+                    refresh_token: this.refreshToken,
+                    client_id: this.clientId,
+                    client_secret: this.clientSecret,
+                    redirect_uri: this.redirectUri,
+                    grant_type: 'refresh_token'
+                },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+
+            if (response.data && response.data.access_token) {
+                console.log('Access token retrieved successfully');
+                return response.data.access_token;
+            } else {
+                throw new Error('Failed to retrieve access token');
+            }
+        } catch (error) {
+            console.error('Error while trying to get access token:', error);
             throw error;
         }
     }
