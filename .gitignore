@@ -80,3 +80,4 @@ fabric.properties
 /node_modules/
 /.idea/
 test.js
+!/ZohoCRMConnector.test.js
